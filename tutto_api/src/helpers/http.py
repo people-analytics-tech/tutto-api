@@ -1,4 +1,4 @@
-"""Module to handle requests to an API"""
+"""Module to handle requests to an API."""
 
 import aiohttp
 

@@ -1,14 +1,15 @@
-"""Class to represent the endpoints of Tutto API"""
+"""Class to represent the endpoints of Tutto API."""
 
 import asyncio
 
-from typing import List
+from typing import List, Union, Any
 from datetime import date
 from dataclasses import dataclass, field
 from operator import itemgetter
 from abc import ABC, abstractmethod
 
 from tutto_api.src.helpers.http import HTTPRequest
+from tutto_api.src.models.entities import Relative, Occurrence
 
 
 @dataclass(init=False, frozen=True, slots=True)
@@ -17,7 +18,7 @@ class Endpoint(ABC):
     bearer_token: str = field()
 
     @abstractmethod
-    def call(self) -> dict:
+    def call(self) -> Any:
         pass
 
 
@@ -27,74 +28,25 @@ class EndpointFactory:
         base_url: str, endpoint: str, bearer_token: str, **kwargs
     ) -> Endpoint:
         """Factory method to create an endpoint object"""
-        endpoints = {
+        endpoints: dict[str, Endpoint] = {
             "deductions": Deductions,
+            "purchases": Purchases,
+            "service_types": ServiceTypes,
+            "dirf_infos": DirfInfos,
+            "dirf_additional_infos": DirfAdditionalInfos,
+            "auth": Auth,
+            "employees": Employees,
+            "employees_occupations": EmployeesOccupations,
+            "occupations": Occupations,
+            "service_tickets": ServiceTickets,
         }
-        endpoint_class = endpoints.get(endpoint)
+        endpoint_class: Union[Endpoint, None] = endpoints.get(endpoint)
+
         if endpoint_class:
             http_client = HTTPRequest(base_url=base_url)
             return endpoint_class(
                 http_client=http_client, bearer_token=bearer_token, **kwargs
             )
-
-
-### Entities ###
-@dataclass(init=True, frozen=True, slots=True)
-class Relative:
-    """Class to represent a relative entity.\n
-    Args:
-        name (str, optional): Relative name.
-        code (str, optional): Relative code.
-        birthday_date (date, optional): Relative birthday date.
-        vat (str, optional): Relative VAT number.
-        id_card (str, optional): Relative ID card number.
-        id_card_entity (str, optional): Relative ID card entity.
-        id_card_emission (date, optional): Relative ID card emission date.
-        id_card_emission_state (str, optional): Relative ID card emission
-        gender (str, optional): Relative gender.
-        kinship_degree (str, optional): Relative kinship degree.
-        marital_status (str, optional): Relative marital status.
-        sus_card (str, optional): Relative SUS card number.
-        mother_name (str, optional): Relative mother name.
-        father_name (str, optional): Relative father name.
-        race (str, optional): Relative pet race.
-        species (str, optional): Relative pet species.
-    """
-
-    name: str = field(default="")
-    code: str = field(default="")
-    birthday_date: date = field(default=None)
-    vat: str = field(default="")
-    id_card: str = field(default="")
-    id_card_entity: str = field(default="")
-    id_card_emission: date = field(default=None)
-    id_card_emission_state: str = field(default="")
-    gender: str = field(default="")
-    kinship_degree: str = field(default="")
-    marital_status: str = field(default="")
-    sus_card: str = field(default="")
-    mother_name: str = field(default="")
-    father_name: str = field(default="")
-    race: str = field(default="")
-    species: str = field(default="")
-
-
-@dataclass(init=True, frozen=True, slots=True)
-class Occurrence:
-    """Class to represent an occurrence entity.\n
-    Args:
-        type (str, optional): Occurrence type.
-        start_date (date, optional): Occurrence date.
-        end_date (date, optional): Occurrence end date.
-        absence_reason_code (str, optional): Absence reason code.
-        absence_reason_name (str, optional): Absence reason name.
-    """
-
-    type: str = field(default="")
-    start_date: date = field(default=None)
-    end_date: date = field(default=None)
-    absence_reason_code: str = field(default="")
-    absence_reason_name: str = field(default="")
 
 
 ### Endpoints ###
@@ -119,7 +71,7 @@ class Deductions(Endpoint):
     end_date: str = field(default="")
     id: int = field(default=0)
 
-    def call(self) -> dict:
+    def call(self) -> Any:
         payload = {
             "reference": self.reference,
             "type": self.type,
@@ -157,7 +109,7 @@ class Purchases(Endpoint):
     end_date: str = field(default="")
     id: int = field(default=0)
 
-    def call(self) -> dict:
+    def call(self) -> Any:
         payload = {
             "reference": self.reference,
             "type": self.type,
@@ -182,7 +134,7 @@ class ServiceTypes(Endpoint):
     http_client: HTTPRequest
     bearer_token: str
 
-    def call(self) -> dict:
+    def call(self) -> Any:
         return asyncio.run(
             self.http_client.request(
                 endpoint="/service_types",
@@ -216,7 +168,7 @@ class DirfInfos(Endpoint):
     end_date: str = field(default="")
     id: int = field(default=0)
 
-    def call(self) -> dict:
+    def call(self) -> Any:
         payload = {
             "reference": self.reference,
             "layout": self.layout,
@@ -260,7 +212,7 @@ class DirfAdditionalInfos(Endpoint):
     end_date: str = field(default="")
     id: int = field(default=0)
 
-    def call(self) -> dict:
+    def call(self) -> Any:
         payload = {
             "reference": self.reference,
             "layout": self.layout,
@@ -289,14 +241,14 @@ class Auth(Endpoint):
         password (str, required): Password.
         user_type (str, required): User type.
     """
-
     http_client: HTTPRequest
+    bearer_token: str = field(default="", init=False)
 
     username: str
     password: str
     user_type: str
 
-    def call(self) -> dict:
+    def call(self) -> Any:
         payload = {
             "user": self.username,
             "password": self.password,
@@ -417,7 +369,7 @@ class Employees(Endpoint):
     relatives: List[Relative] = field(default_factory=list)
     occurrences: List[Occurrence] = field(default_factory=list)
 
-    def call(self) -> dict:
+    def call(self) -> Any:
         payload = {
             "company_code": self.company_code,
             "company_vat": self.company_vat,
@@ -511,16 +463,17 @@ class EmployeesOccupations(Endpoint):
         vat (str, required): Employee VAT number.
         occupation_code (str, required): Employee occupation code.
     """
+
     http_client: HTTPRequest
     bearer_token: str
 
-    company_code: str = field(default="")
-    company_vat: str = field(default="")
     badge: str
     vat: str
     occupation_code: str
+    company_code: str = field(default="")
+    company_vat: str = field(default="")
 
-    def call(self) -> dict:
+    def call(self) -> Any:
         payload = {
             "company_code": self.company_code,
             "company_vat": self.company_vat,
@@ -549,17 +502,18 @@ class Occupations(Endpoint):
         description (str, required): Occupation description.
         points (int, required): Occupation points.
     """
+
     http_client: HTTPRequest
     bearer_token: str
 
-    company_code: str = field(default="")
-    company_vat: str = field(default="")
     code: str
     name: str
     description: str
     points: int
+    company_code: str = field(default="")
+    company_vat: str = field(default="")
 
-    def call(self) -> dict:
+    def call(self) -> Any:
         payload = {
             "company_code": self.company_code,
             "company_vat": self.company_vat,
@@ -589,6 +543,7 @@ class ServiceTickets(Endpoint):
         description (str, required): Service description.
         service_type_id (int, required): Service type ID.
     """
+
     http_client: HTTPRequest
     bearer_token: str
 
@@ -599,7 +554,7 @@ class ServiceTickets(Endpoint):
     description: str
     service_type_id: int
 
-    def call(self) -> dict:
+    def call(self) -> Any:
         payload = {
             "employee_badge": self.employee_badge,
             "employee_vat": self.employee_vat,
@@ -616,5 +571,3 @@ class ServiceTickets(Endpoint):
                 json=dict(filter(itemgetter(1), payload.items())),
             )
         )
-
-
