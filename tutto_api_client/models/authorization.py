@@ -26,13 +26,9 @@ class _Auth:
 
     def as_dict(self) -> dict:
         return {
-            "status": self.status,
-            "message": self.message,
-            "type": self.type,
-            "token": self.token,
-            "companies": self.companies,
-            "companies_codes": self.companies_codes,
-            "companies_names": self.companies_names,
+            field.name: getattr(self, field.name)
+            for field in self.__dataclass_fields__.values()
+            if field.name in self.__annotations__
         }
 
     def as_bearer_token(self) -> dict:
