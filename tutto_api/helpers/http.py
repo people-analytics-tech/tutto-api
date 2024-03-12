@@ -21,7 +21,7 @@ class HTTPRequest:
         parameters: dict = None,
         data: Any = None,
         json: Any = None,
-    ):
+    ) -> dict:
         request_url = urljoin(base=self.base_url, url=endpoint)
         headers = {**headers} if headers else {}
         response = None
