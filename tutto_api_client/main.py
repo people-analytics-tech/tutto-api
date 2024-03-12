@@ -1,12 +1,11 @@
 """This module provides the main client class for the Tutto API."""
 
-from typing import Literal, Union, List
+from typing import List
 from datetime import date
 
-from tutto_api.core.endpoints_factory import _EndpointFactory, _EndpointCatalog
-from tutto_api.models.authorization import Authorization
-from tutto_api.models.entities import Relative, Occurrence
-from tutto_api.models.endpoints import (
+from tutto_api_client.models.authorization import Authorization
+from tutto_api_client.models.entities import Relative, Occurrence
+from tutto_api_client.models.endpoints import (
     _Deductions,
     _Purchases,
     _ServiceTypes,
@@ -16,11 +15,13 @@ from tutto_api.models.endpoints import (
     _EmployeesOccupations,
     _Occupations,
     _ServiceTickets,
-    Endpoint,
 )
+from tutto_api_client.core.endpoints_factory import _EndpointFactory
+
+__all__ = ["TuttoAPIClient"]
 
 
-class TuttoAPI:
+class TuttoAPIClient:
     """
     The main client class for the Tutto API.
 
@@ -32,19 +33,11 @@ class TuttoAPI:
     def __init__(
         self,
         base_url: str,
-        user: str,
-        password: str,
-        basic_auth: str,
-        user_type: Union[Literal["external"], str] = "external",
+        authorization: Authorization,
     ) -> None:
-        self.__authorization = Authorization(
-            base_url=base_url,
-            user=user,
-            password=password,
-            basic_auth=basic_auth,
-            user_type=user_type,
-        )
         self.__base_url = base_url
+        self.__authorization = authorization
+        pass
 
     def get_deductions(
         self,
@@ -53,7 +46,7 @@ class TuttoAPI:
         start_date: str = "",
         end_date: str = "",
         id: int = 0,
-    ) -> Union[_Deductions, Endpoint]:
+    ) -> _Deductions:
         """
         Get an instance of the Deductions endpoint.
 
@@ -78,7 +71,7 @@ class TuttoAPI:
         start_date: str = "",
         end_date: str = "",
         id: int = 0,
-    ) -> Union[_Purchases, Endpoint]:
+    ) -> _Purchases:
         """
         Get an instance of the Purchases endpoint.
 
@@ -96,7 +89,7 @@ class TuttoAPI:
             id=id,
         )
 
-    def get_service_types(self) -> Union[_ServiceTypes, Endpoint]:
+    def get_service_types(self) -> _ServiceTypes:
         """
         Get an instance of the ServiceTypes endpoint.
 
@@ -118,7 +111,7 @@ class TuttoAPI:
         start_date: str = "",
         end_date: str = "",
         id: int = 0,
-    ) -> Union[_DirfInfos, Endpoint]:
+    ) -> _DirfInfos:
         """
         Get an instance of the DirfInfos endpoint.
 
@@ -147,7 +140,7 @@ class TuttoAPI:
         start_date: str = "",
         end_date: str = "",
         id: int = 0,
-    ) -> Union[_DirfAdditionalInfos, Endpoint]:
+    ) -> _DirfAdditionalInfos:
         """
         Get an instance of the DirfAdditionalInfos endpoint.
 
@@ -217,7 +210,7 @@ class TuttoAPI:
         resignation_reason_name: str,
         relatives: List[Relative] = [],
         occurrences: List[Occurrence] = [],
-    ) -> Union[_Employees, Endpoint]:
+    ) -> _Employees:
         """
         Get an instance of the Employees endpoint.
 
@@ -276,4 +269,83 @@ class TuttoAPI:
             resignation_reason_name=resignation_reason_name,
             relatives=relatives,
             occurrences=occurrences,
+        )
+
+    def get_employees_occupations(
+        self,
+        badge: str,
+        vat: str,
+        occupation_code: str,
+        company_code: str = "",
+        company_vat: str = "",
+    ) -> _EmployeesOccupations:
+        """
+        Get an instance of the EmployeesOccupations endpoint.
+
+        Returns:
+            EmployeesOccupations: An instance of the EmployeesOccupations endpoint.
+        """
+        return _EndpointFactory.create_endpoint(
+            base_url=self.__base_url,
+            endpoint="employees_occupations",
+            authorization=self.__authorization,
+            badge=badge,
+            vat=vat,
+            occupation_code=occupation_code,
+            company_code=company_code,
+            company_vat=company_vat,
+        )
+
+    def get_occupations(
+        self,
+        name: str,
+        code: str,
+        description: str,
+        points: int,
+        company_code: str = "",
+        company_vat: str = "",
+    ) -> _Occupations:
+        """
+        Get an instance of the Occupations endpoint.
+
+        Returns:
+            Occupations: An instance of the Occupations endpoint.
+        """
+        return _EndpointFactory.create_endpoint(
+            base_url=self.__base_url,
+            endpoint="occupations",
+            authorization=self.__authorization,
+            name=name,
+            code=code,
+            description=description,
+            points=points,
+            company_code=company_code,
+            company_vat=company_vat,
+        )
+
+    def get_service_tickets(
+        self,
+        employee_badge: str,
+        employee_vat: str,
+        employee_email: str,
+        title: str,
+        description: str,
+        service_type_id: int,
+    ) -> _ServiceTickets:
+        """
+        Get an instance of the ServiceTickets endpoint.
+
+        Returns:
+            ServiceTickets: An instance of the ServiceTickets endpoint.
+        """
+        return _EndpointFactory.create_endpoint(
+            base_url=self.__base_url,
+            endpoint="service_tickets",
+            authorization=self.__authorization,
+            employee_badge=employee_badge,
+            employee_vat=employee_vat,
+            employee_email=employee_email,
+            title=title,
+            description=description,
+            service_type_id=service_type_id,
         )

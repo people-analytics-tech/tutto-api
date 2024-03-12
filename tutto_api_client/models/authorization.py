@@ -5,8 +5,8 @@ import asyncio
 from typing import Union, Literal, List, Optional
 from dataclasses import dataclass
 
-from tutto_api.helpers.http import HTTPRequest
-from tutto_api.utils.filter_clean_utils import split_str_to_list
+from tutto_api_client.helpers.http import HTTPRequest
+from tutto_api_client.utils.filter_clean_utils import split_str_to_list
 
 
 @dataclass(slots=True, init=True)
@@ -20,13 +20,9 @@ class _Auth:
     companies_names: List[str]
 
     def __post_init__(self) -> None:
-        self.companies = split_str_to_list(values=self.companies, dtype="int")
-        self.companies_codes = split_str_to_list(
-            values=self.companies_codes, dtype="int"
-        )
-        self.companies_names = split_str_to_list(
-            values=self.companies_names, dtype="str"
-        )
+        self.companies = split_str_to_list(self.companies, dtype="int")
+        self.companies_codes = split_str_to_list(self.companies_codes, dtype="int")
+        self.companies_names = split_str_to_list(self.companies_names, dtype="str")
 
     def as_dict(self) -> dict:
         return {
@@ -47,21 +43,39 @@ class Authorization:
     def __init__(
         self,
         base_url: str,
-        user: str,
-        password: str,
-        basic_auth_token: str,
-        user_type: Union[Literal["external"], str],
+        user: str = "",
+        user_type: Union[Literal["external"], str] = "external",
+        password: str = "",
+        basic_auth_token: str = "",
+        bearer_token: str = "",
     ) -> None:
-        self.http_client = HTTPRequest(base_url=base_url)
+        # Initialize the class
+        self.__http_client = HTTPRequest(base_url=base_url)
         self.__user = user
+        self.__user_type = user_type
         self.__password = password
         self.__basic_auth_token = basic_auth_token
-        self.__user_type = user_type
+        self.__bearer_token = bearer_token
+        # Check initialization
+        self.__check_init()
         pass
+
+    def __check_init(self) -> None:
+        # Errors
+        if not self.__basic_auth_token and not self.__bearer_token:
+            raise ValueError("Basic auth token or bearer token are required.")
+        if not self.__bearer_token and not (self.__user and self.__password):
+            raise ValueError("User and password are required to get a bearer token.")
+        # Warnings
+        if self.__bearer_token and self.__basic_auth_token:
+            print(
+                "Auth Warning: Both basic auth and bearer token were provided. "
+                "Using bearer token."
+            )
 
     def __get_auth(self) -> Optional[dict]:
         request = asyncio.run(
-            self.http_client.request(
+            self.__http_client.request(
                 endpoint="auth",
                 method="post",
                 headers={
@@ -80,6 +94,16 @@ class Authorization:
 
     @property
     def auth(self) -> Optional[_Auth]:
+        if self.__bearer_token:
+            return _Auth(
+                status=0,
+                message="Bearer token was user provided",
+                type="bearer",
+                token=self.__bearer_token,
+                companies=[],
+                companies_codes=[],
+                companies_names=[],
+            )
         request = self.__get_auth()
         if request:
             return _Auth(**request)
