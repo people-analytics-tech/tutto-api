@@ -4,9 +4,15 @@ import asyncio
 
 from typing import Union, Literal, List, Optional
 from dataclasses import dataclass
+from enum import Enum
 
 from tutto_api_client.helpers.http import HTTPRequest
 from tutto_api_client.utils.filter_clean_utils import split_str_to_list
+
+
+class _TOKEN_ORIGIN(Enum):
+    USER = "user"
+    API = "api"
 
 
 @dataclass(slots=True, init=True)
@@ -15,6 +21,7 @@ class _Auth:
     message: str
     type: str
     token: str
+    origin: _TOKEN_ORIGIN
     companies: List[int]
     companies_codes: List[int]
     companies_names: List[str]
@@ -93,13 +100,14 @@ class Authorization:
         if self.__bearer_token:
             return _Auth(
                 status=0,
-                message="Bearer token was user provided",
+                message="",
                 type="bearer",
                 token=self.__bearer_token,
+                origin=_TOKEN_ORIGIN.USER,
                 companies=[],
                 companies_codes=[],
                 companies_names=[],
             )
         request = self.__get_auth()
         if request:
-            return _Auth(**request)
+            return _Auth(**request, origin=_TOKEN_ORIGIN.API)
