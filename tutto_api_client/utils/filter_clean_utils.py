@@ -26,7 +26,10 @@ def split_str_to_list(
         List[dtype]: A list of values converted to the specified data type.
     """
     data_type = locate(dtype)
-    return [data_type(element) for element in values.split(split_by)]
+    if isinstance(values, str):
+        return [data_type(element) for element in values.split(split_by)]
+    else:
+        return values
 
 
 @staticmethod
