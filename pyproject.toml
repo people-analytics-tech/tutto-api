@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "tutto-api"
+name = "tutto-api-client"
 version = "0.1.0"
 description = ""
 authors = ["rapha-pereira <raphaelpgomes1@gmail.com>"]
