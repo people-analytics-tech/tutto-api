@@ -4,15 +4,15 @@ import asyncio
 
 from typing import Union, Literal, List, Optional
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, auto
 
 from tutto_api_client.helpers.http import HTTPRequest
 from tutto_api_client.utils.filter_clean_utils import split_str_to_list
 
 
 class _TOKEN_ORIGIN(Enum):
-    USER = "user"
-    API = "api"
+    USER = auto()
+    API = auto()
 
 
 @dataclass(slots=True, init=True)
@@ -61,7 +61,6 @@ class Authorization:
         self.__bearer_token = bearer_token
         # Check initialization
         self.__check_init()
-        pass
 
     def __check_init(self) -> None:
         # Errors
