@@ -5,7 +5,7 @@ from datetime import date
 
 
 ### Entities ###
-@dataclass(init=True, frozen=True, slots=True)
+@dataclass(init=True, frozen=True)
 class Relative:
     """Class to represent a relative entity.\n
     Args:
@@ -45,7 +45,7 @@ class Relative:
     species: str = field(default="")
 
 
-@dataclass(init=True, frozen=True, slots=True)
+@dataclass(init=True, frozen=True)
 class Occurrence:
     """Class to represent an occurrence entity.\n
     Args:
