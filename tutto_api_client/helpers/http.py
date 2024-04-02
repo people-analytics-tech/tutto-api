@@ -1,13 +1,12 @@
 """Module to handle requests to an API."""
 
 import aiohttp
-
 from urllib.parse import urljoin
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
 
-@dataclass(init=True, frozen=True, slots=True)
+@dataclass(init=True, frozen=True)
 class HTTPRequest:
     """Class to handle requests to an API"""
 
@@ -27,52 +26,46 @@ class HTTPRequest:
         response = None
 
         async with aiohttp.ClientSession() as session:
-            match method:
-                case "get":
-                    response = await session.get(
-                        url=request_url,
-                        headers=headers,
-                        params=parameters,
-                    )
-
-                case "post":
-                    response = await session.post(
-                        url=request_url,
-                        headers=headers,
-                        params=parameters,
-                        data=data,
-                        json=json,
-                    )
-
-                case "put":
-                    response = await session.put(
-                        url=request_url,
-                        headers=headers,
-                        params=parameters,
-                        data=data,
-                        json=json,
-                    )
-
-                case "patch":
-                    response = await session.patch(
-                        url=request_url,
-                        headers=headers,
-                        params=parameters,
-                        data=data,
-                        json=json,
-                    )
-
-                case "delete":
-                    response = await session.delete(
-                        url=request_url,
-                        headers=headers,
-                        params=parameters,
-                        data=data,
-                        json=json,
-                    )
-
-                case _:
-                    raise ValueError("Invalid HTTP method")
+            if method == "get":
+                response = await session.get(
+                    url=request_url,
+                    headers=headers,
+                    params=parameters,
+                )
+            elif method == "post":
+                response = await session.post(
+                    url=request_url,
+                    headers=headers,
+                    params=parameters,
+                    data=data,
+                    json=json,
+                )
+            elif method == "put":
+                response = await session.put(
+                    url=request_url,
+                    headers=headers,
+                    params=parameters,
+                    data=data,
+                    json=json,
+                )
+            elif method == "patch":
+                response = await session.patch(
+                    url=request_url,
+                    headers=headers,
+                    params=parameters,
+                    data=data,
+                    json=json,
+                )
+            elif method == "delete":
+                response = await session.delete(
+                    url=request_url,
+                    headers=headers,
+                    params=parameters,
+                    data=data,
+                    json=json,
+                )
+            else:
+                raise ValueError("Invalid HTTP method")
 
             # Check response
             response.raise_for_status()
