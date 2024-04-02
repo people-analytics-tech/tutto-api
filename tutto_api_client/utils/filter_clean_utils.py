@@ -59,6 +59,7 @@ def convert_dict_dates_to_isoformat(dictionary: dict) -> dict:
         dict: The dictionary with date values converted to ISO 8601 format.
     """
 
+    @staticmethod
     def convert_value(value):
         if isinstance(value, date):
             return value.isoformat()
