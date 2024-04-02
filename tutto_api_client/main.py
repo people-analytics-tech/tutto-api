@@ -37,7 +37,6 @@ class TuttoAPIClient:
     ) -> None:
         self.__base_url = base_url
         self.__authorization = authorization
-        pass
 
     def get_deductions(
         self,
