@@ -99,7 +99,6 @@ class _EndpointCatalog:
 
 
 class _EndpointFactory:
-    @staticmethod
     def create_endpoint(
         base_url: str, endpoint: str, authorization: Authorization, **kwargs
     ) -> Endpoint:

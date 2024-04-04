@@ -6,7 +6,6 @@ from pydoc import locate
 from operator import itemgetter
 
 
-@staticmethod
 def split_str_to_list(
     values: str,
     split_by: str = ",",
@@ -32,7 +31,6 @@ def split_str_to_list(
         return values
 
 
-@staticmethod
 def filter_dict_with_falsy_values(dictionary: dict) -> dict:
     """
     Filters a dictionary by removing key-value pairs where the value is falsy.
@@ -46,7 +44,6 @@ def filter_dict_with_falsy_values(dictionary: dict) -> dict:
     return dict(filter(itemgetter(1), dictionary.items()))
 
 
-@staticmethod
 def convert_dict_dates_to_isoformat(dictionary: dict) -> dict:
     """
     Converts date values in a dictionary to ISO 8601 format.
@@ -59,7 +56,6 @@ def convert_dict_dates_to_isoformat(dictionary: dict) -> dict:
         dict: The dictionary with date values converted to ISO 8601 format.
     """
 
-    @staticmethod
     def convert_value(value):
         if isinstance(value, date):
             return value.isoformat()
