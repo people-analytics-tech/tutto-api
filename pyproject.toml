@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tutto-api-client"
-version = "1.0.2"
+version = "1.0.3"
 description = ""
 authors = ["rapha-pereira <raphaelpgomes1@gmail.com>"]
 readme = "README.md"
