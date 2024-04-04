@@ -15,7 +15,7 @@ class _TOKEN_ORIGIN(Enum):
     API = auto()
 
 
-@dataclass(slots=True, init=True)
+@dataclass(init=True)
 class _Auth:
     status: int
     message: str
