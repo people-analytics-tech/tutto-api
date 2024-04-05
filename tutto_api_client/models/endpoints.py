@@ -113,6 +113,9 @@ class _Purchases(Endpoint):
 class _ServiceTypes(Endpoint):
     """Class to handle the 'service_types' endpoint."""
 
+    def as_dict(self) -> dict:
+        return {}
+
     def call(self):
         endpoint = "service_types"
         method = "get"
