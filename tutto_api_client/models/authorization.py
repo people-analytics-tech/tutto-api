@@ -17,6 +17,7 @@ class _TOKEN_ORIGIN(Enum):
 
 @dataclass(init=True)
 class _Auth:
+    status: int
     message: str
     type: str
     token: str
@@ -90,7 +91,7 @@ class Authorization:
                 },
             )
         )
-        if request["message"] == "Auth OK":
+        if request["status"] == 200:
             return request
 
     @property
