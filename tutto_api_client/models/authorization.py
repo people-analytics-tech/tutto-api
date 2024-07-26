@@ -17,7 +17,7 @@ class _TOKEN_ORIGIN(Enum):
 
 @dataclass(init=True)
 class _Auth:
-    status:int
+    status: int
     message: str
     type: str
     token: str
